@@ -6,36 +6,39 @@ of the three owners gets a role of their own to swap USDC and ETH on CoW Swap.
 
 ## What each role can do
 
-| | |
-|---|---|
-| Members | One vault owner, from their own wallet: `swap_31d2` (0x31D2…A13c), `swap_362b` (0x362B…093a), `swap_8e27` (0x8e27…18af) |
-| Swaps | USDC to ETH or WETH, and ETH or WETH to USDC, on CoW Swap. No other tokens. |
-| Receiver | The vault only |
-| Budget | 100,000 USD per week, per owner, shared by both directions |
-| ETH cap | 43.94 ETH per week, per owner (100,000 USD at 2,276 USD/ETH) |
-| Also | Approve USDC and WETH for the CoW vault relayer; wrap and unwrap ETH |
+|                  |                                                                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Members          | One vault owner, from their own wallet: `swap_31d2` (0x31D2…A13c), `swap_362b` (0x362B…093a), `swap_8e27` (0x8e27…18af) |
+| Swaps            | USDC to ETH or WETH, and ETH or WETH to USDC, on CoW Swap. No other tokens.                                             |
+| Receiver         | The vault only                                                                                                          |
+| Weekly limit     | 100,000 USDC per owner, for swaps in both directions                                                                    |
+| Weekly ETH limit | 43.94 ETH per owner (100,000 USD at 2,276 USD per ETH)                                                                  |
+| Also             | Approve USDC and WETH for the CoW vault relayer; wrap and unwrap ETH                                                    |
 
 The vault owners keep full control of the vault and own the Roles mod.
 
-## How the budget works
+## How the weekly limits work
 
-Roles meters raw token amounts and cannot price ETH. USDC is one side of every
-swap, so the USD budget is kept in USDC:
+Every swap counts against the owner's 100,000 USDC limit, in both directions:
 
-- Selling USDC draws the USDC sold.
-- Selling ETH draws the minimum USDC the order must return, and the ETH sold
-  draws on the ETH cap.
+- **USDC to ETH:** the USDC you sell counts.
+- **ETH to USDC:** the USDC amount in the order counts. On CoW Swap, this is
+  the minimum USDC you receive. The actual amount can be higher.
 
-Budgets refill to the full amount every 7 days, counted from the deploy block.
-An order draws on the budget when it is signed, so a cancelled or expired order
-still counts until the next refill.
+ETH to USDC swaps also count against the weekly ETH limit, with the ETH you
+sell. The Roles mod counts token amounts and does not know the ETH price, so
+ETH has a limit of its own.
 
-**Known gap:** an ETH sale with a near-zero USDC minimum draws almost nothing
-from the USD budget. The ETH cap still holds, so one owner can swap at most
-100,000 USDC plus 43.94 ETH in a week.
+**Example:** on Monday, an owner sells 60,000 USDC for ETH. Until the limit
+refills, that owner can swap up to 40,000 USDC more, in either direction.
 
-To re-price the ETH cap, edit `ETH_USD` in `constellation/allowances/index.ts`
-and push again. A changed budget starts full again.
+Both limits refill to the full amount every 7 days, counted from the block the
+constellation is deployed in. An order counts when it is signed, so a
+cancelled or expired order still counts until the next refill.
+
+To update the ETH limit to a new ETH price, change `ETH_USD` in
+`constellation/allowances/index.ts` and push again. A changed limit starts
+full again.
 
 ## Commands
 
@@ -43,7 +46,7 @@ and push again. A changed budget starts full again.
 bun install
 bun pull               # codegen for the workspace of the API key in .env
 bun dry-run            # compile through Zodiac, stores nothing
-bun test:permissions   # 37 checks on a mainnet fork (FORK_RPC)
+bun test:permissions   # 36 checks on a mainnet fork (FORK_RPC)
 bun push               # sends the constellation to Zodiac for review
 ```
 

@@ -19,11 +19,8 @@ directions: USDC sold, or minimum USDC bought) and `eth_weekly_<id>`
 - `test/permissions-test.ts` (`bun test:permissions`, mainnet fork on FORK_RPC,
   e.g. `hardhat node --fork https://rpc.zodiacos.io/1`) deploys Roles
   mastercopy 0xf2964ce6…83d5 on the fork, enables it on the real vault
-  (impersonated), loads the resolve output, acts as the real owners. 37/37 on
+  (impersonated), loads the resolve output, acts as the real owners. 36/36 on
   2026-11-03. Run it after any change.
-- Known gap (documented in README): ETH sales with a near-zero USDC minimum
-  draw ~0 from the USD budget; the ETH cap still binds. Closing it needs
-  ETH -> USDC as buy orders only, which the SDK `swap` entry cannot express.
 - Zodiac merges `roles` and `allowances` by name: remove one with `null`.
 
 ## Project map

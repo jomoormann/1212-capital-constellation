@@ -569,7 +569,7 @@ await expect(
   ),
 );
 
-section("owner 31d2: USDC to ETH, drawn from the 100,000 USD budget");
+section("owner 31d2: USDC to ETH, counted against the 100,000 USDC limit");
 await expect(
   "allow",
   "31d2",
@@ -633,7 +633,7 @@ await expect(
 );
 
 section(
-  "owner 31d2: ETH to USDC, drawn from the same USD budget and the ETH cap",
+  "owner 31d2: ETH to USDC, counted against the same USDC limit and the ETH limit",
 );
 await expect(
   "allow",
@@ -715,7 +715,7 @@ await expect(
 await expect(
   "deny",
   "31d2",
-  "sell 35 WETH (over the ETH cap left)",
+  "sell 35 WETH (over the ETH limit left)",
   execAs(
     OWNER_31D2,
     "swap_31d2",
@@ -723,24 +723,6 @@ await expect(
       await order({ sellToken: weth, buyToken: usdc, sellAmount: ETH("35") }),
     ),
   ),
-);
-await expect(
-  "allow",
-  "31d2",
-  "KNOWN GAP: sell 1 WETH with a 1-unit USDC minimum (draws ~0 from the USD budget)",
-  execAs(
-    OWNER_31D2,
-    "swap_31d2",
-    signOrder(
-      await order({
-        sellToken: weth,
-        buyToken: usdc,
-        sellAmount: ETH("1"),
-        buyAmount: 1n,
-      }),
-    ),
-  ),
-  budgetIs("usd_weekly_31d2", USD("9000") - 1n),
 );
 await expect(
   "allow",

@@ -1,13 +1,13 @@
-// Each owner can swap up to 100,000 USD a week, in either direction.
+// Each owner can swap up to 100,000 USDC a week, in either direction.
 //
-// The USD budget is kept in USDC units, since USDC is one side of every swap:
-// selling USDC draws the USDC sold, selling ETH draws the minimum USDC the
-// order must return. Roles v2 meters raw token amounts and cannot price ETH,
-// so ETH sales also draw on an ETH cap worth 100,000 USD at the price below.
-// Re-price by editing ETH_USD and pushing again (a changed budget restarts
-// full).
+// USDC is one side of every swap, so one USDC limit covers both directions:
+// - USDC to ETH: the USDC sold counts.
+// - ETH to USDC: the USDC amount in the order (the minimum received) counts.
+// The Roles mod counts token amounts and does not know the ETH price, so ETH
+// sales also count against an ETH limit worth 100,000 USD at the price below.
+// To update it, change ETH_USD and push again (a changed limit starts full).
 //
-// Budgets refill to the full amount every 7 days, counted from the block the
+// Limits refill to the full amount every 7 days, counted from the block the
 // constellation is deployed in, and start full.
 const ETH_USD = 2_276n; // Chainlink ETH/USD, 2026-11-03, block 26,334,470
 
